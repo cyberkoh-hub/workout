@@ -335,21 +335,23 @@ svg.chart{width:100%;height:auto;display:block;margin-top:8px}
       walk.push(e.walk>0?e.walk:0);
       push.push(e.pushup>0?e.pushup:0);
       stretch.push(!!e.stretch);
-      squat.push(e.squat>0);
+      squat.push(e.squat>0?e.squat:0);
     }
     var elapsed=(vy===t.y&&vm===t.m)?t.d:n;
     var sum=function(a){return a.reduce(function(x,y){return x+y;},0);};
-    var walkTotal=sum(walk), pushTotal=sum(push);
+    var walkTotal=sum(walk), pushTotal=sum(push), squatTotal=sum(squat);
     var walkDays=walk.filter(function(v){return v>0;}).length;
     var pushDays=push.filter(function(v){return v>0;}).length;
-    var stDays=stretch.filter(Boolean).length, sqDays=squat.filter(Boolean).length;
+    var stDays=stretch.filter(Boolean).length, sqDays=squat.filter(function(v){return v>0;}).length;
 
     var h='<div class="tiles">'
+      +'<div class="tile" style="background:linear-gradient(135deg,#16c47f,#4fdca6)"><div class="t">🧘 스트레칭</div><div class="v">'+stDays+'<small>일</small></div></div>'
       +'<div class="tile" style="background:linear-gradient(135deg,#2f7bff,#56a4ff)"><div class="t">🚶 걷기 합계</div><div class="v">'+fmt(walkTotal)+'<small>보</small></div></div>'
       +'<div class="tile" style="background:linear-gradient(135deg,#ff8a1f,#ffb04a)"><div class="t">🔥 푸시업 합계</div><div class="v">'+pushTotal.toLocaleString('ko-KR')+'<small>개</small></div></div>'
-      +'<div class="tile" style="background:linear-gradient(135deg,#16c47f,#4fdca6)"><div class="t">🧘 스트레칭</div><div class="v">'+stDays+'<small>일</small></div></div>'
-      +'<div class="tile" style="background:linear-gradient(135deg,#a15cff,#c18bff)"><div class="t">🏋️ 스쿼트</div><div class="v">'+sqDays+'<small>일</small></div></div>'
+      +'<div class="tile" style="background:linear-gradient(135deg,#a15cff,#c18bff)"><div class="t">🏋️ 스쿼트 합계</div><div class="v">'+squatTotal.toLocaleString('ko-KR')+'<small>개</small></div></div>'
       +'</div>';
+
+    h+=daysCard('stretch','🧘','스트레칭 한 날',stretch,elapsed);
 
     h+='<section class="card"><div class="cardhead"><h2>🚶 걷기 (보)</h2></div>'
       +'<div class="big" style="color:'+COLORS.walk+'">'+fmt(walkTotal)+'<small>보</small></div>'
@@ -361,8 +363,10 @@ svg.chart{width:100%;height:auto;display:block;margin-top:8px}
       +'<div class="subtxt">'+(vm+1)+'월 '+pushDays+'일 했고, 한 날은 평균 '+fmt(pushDays?Math.round(pushTotal/pushDays):0)+'개</div>'
       +barChart(push,COLORS.pushup,20)+'</section>';
 
-    h+=daysCard('stretch','🧘','스트레칭 한 날',stretch,elapsed);
-    h+=daysCard('squat','🏋️','스쿼트 한 날',squat,elapsed);
+    h+='<section class="card"><div class="cardhead"><h2>🏋️ 스쿼트 (개)</h2></div>'
+      +'<div class="big" style="color:'+COLORS.squat+'">'+squatTotal.toLocaleString('ko-KR')+'<small>개</small></div>'
+      +'<div class="subtxt">'+(vm+1)+'월 '+sqDays+'일 했고, 한 날은 평균 '+fmt(sqDays?Math.round(squatTotal/sqDays):0)+'개</div>'
+      +barChart(squat,COLORS.squat,20)+'</section>';
     $('month').innerHTML=h;
   }
 
